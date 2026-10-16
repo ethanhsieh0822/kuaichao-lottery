@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>筷炒 | 會員好禮拉霸</title>
+  <meta name="theme-color" content="#1f244d">
+  <link rel="icon" href="images/logo-180.png">
+  <link rel="apple-touch-icon" href="images/logo-180.png">
+  <style>
+    :root {
+      /* 品牌色 */
+      --navy: #1f244d;
+      --navy-d: #151938;
+      --cream: #dfdacb;
+      --cream-l: #efebe0;
+      /* 點綴色（只用在燈泡、彩帶、印章） */
+      --red: #e63946;
+      --gold: #f2b632;
+      --muted: rgba(31, 36, 77, 0.68);
+      --cell: 84px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--navy);
+      background-image: radial-gradient(rgba(223, 218, 203, 0.08) 1.5px, transparent 1.7px);
+      background-size: 18px 18px;
+      color: var(--navy);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 16px 0 24px;
+    }
+
+    .frame {
+      width: calc(100% - 32px);
+      max-width: 390px;
+      background: var(--cream);
+      border-radius: 10px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+      padding: 0 16px 18px;
+      overflow: hidden;
+    }
+
+    /* ---------- 跑馬燈文字 ---------- */
+    .ticker {
+      margin: 0 -16px 14px;
+      background: var(--navy-d);
+      color: var(--cream);
+      overflow: hidden;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      padding: 7px 0;
+      border-bottom: 3px solid var(--gold);
+    }
+    .ticker-inner { display: inline-block; animation: ticker 26s linear infinite; }
+    .ticker-inner b { color: var(--gold); margin: 0 10px; }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    .header { text-align: center; }
+    .logo {
+      width: 96px; height: 96px; border-radius: 50%; display: block; margin: 0 auto;
+      box-shadow: 0 0 0 3px var(--gold), 0 0 0 5px var(--navy), 0 8px 16px rgba(0, 0, 0, 0.25);
+    }
+
+    /* ---------- 進度 ---------- */
+    .steps { display: flex; justify-content: center; gap: 6px; margin: 16px 0 16px; }
+    .step {
+      flex: 1; max-width: 100px;
+      font-size: 12px; font-weight: 900; letter-spacing: 1px;
+      padding: 6px 0; text-align: center;
+      border: 2px solid var(--navy); border-radius: 20px;
+      opacity: 0.35;
+    }
+    .step.on { background: var(--navy); color: var(--cream); opacity: 1; box-shadow: 0 3px 0 var(--navy-d); }
+    .step.done { opacity: 1; }
+
+    /* ---------- 場景 ---------- */
+    .scene { display: none; flex-direction: column; align-items: center; text-align: center; }
+    .scene.active { display: flex; animation: fadeUp 0.35s ease-out; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    h1 { font-size: 24px; font-weight: 900; letter-spacing: 1px; margin: 0 0 6px; line-height: 1.25; }
+    h1 em {
+      font-style: normal; color: var(--cream); background: var(--navy);
+      padding: 0 8px; border-radius: 4px; display: inline-block; transform: rotate(-2deg);
+    }
+    .lead { font-size: 13px; font-weight: 700; color: var(--muted); margin: 0 0 14px; line-height: 1.6; }
+
+    .section-title {
+      width: 100%; display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 900; letter-spacing: 3px; margin: 2px 0 10px;
+    }
+    .section-title::before, .section-title::after { content: ""; flex: 1; height: 2px; background: var(--navy); }
+
+    /* ---------- 菜色圖塊（拉霸、獎項卡、兌獎券共用） ---------- */
+    .face {
+      position: relative; overflow: hidden;
+      background: var(--navy); color: var(--cream);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; text-align: center; line-height: 1.15;
+      border-radius: 6px;
+    }
+    .face.alt { background: var(--cream); color: var(--navy); box-shadow: inset 0 0 0 2px var(--navy); }
+    .face.coin {
+      background: radial-gradient(circle at 35% 30%, #ffe39a, var(--gold) 55%, #c8901a);
+      color: var(--navy); box-shadow: inset 0 0 0 2px var(--navy);
+    }
+    .face img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .face.has-img span {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 1;
+      background: rgba(31, 36, 77, 0.82); color: var(--cream);
+      font-size: 11px !important; padding: 3px 2px;
+    }
+
+    /* ---------- 獎項卡片 ---------- */
+    .prize-grid {
+      list-style: none; margin: 0 0 16px; padding: 0; width: 100%;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+    }
+    .pcard {
+      background: var(--cream-l); border: 2px solid var(--navy); border-radius: 8px;
+      overflow: hidden; box-shadow: 3px 3px 0 var(--navy);
+    }
+    .pcard .face { aspect-ratio: 16 / 10; border-radius: 0; font-size: 17px; box-shadow: none; }
+    .pcard .face br { display: none; }
+    .pcard .face.alt { box-shadow: none; border-bottom: 2px solid var(--navy); }
+    .pcard .nm { font-size: 13px; font-weight: 900; padding: 7px 3px 1px; line-height: 1.3; }
+    .pcard .vl { font-size: 11px; font-weight: 700; color: var(--muted); padding-bottom: 6px; }
+
+    /* ---------- 活動說明 ---------- */
+    .rules {
+      width: 100%; text-align: left;
+      font-size: 12px; font-weight: 600; line-height: 1.65;
+      background: var(--cream-l); border: 2px dashed var(--navy); border-radius: 8px;
+      padding: 10px 10px 10px 4px; margin: 0 0 16px;
+    }
+    .rules ul { margin: 0; padding-left: 20px; }
+
+    /* ---------- 按鈕 ---------- */
+    .btn {
+      display: block; width: 100%;
+      padding: 15px 10px;
+      background: var(--navy); color: var(--cream);
+      border: none; border-radius: 10px;
+      font-size: 17px; font-weight: 900; letter-spacing: 2px;
+      text-align: center; text-decoration: none; font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 5px 0 var(--navy-d), 0 8px 14px rgba(0, 0, 0, 0.2);
+      transition: transform 0.08s, box-shadow 0.08s, opacity 0.2s;
+    }
+    .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--navy-d); }
+    .btn:disabled { opacity: 0.5; cursor: default; transform: translateY(4px); box-shadow: 0 1px 0 var(--navy-d); }
+    .btn-ghost {
+      background: transparent; color: var(--navy);
+      border: 2px solid var(--navy); box-shadow: 0 3px 0 var(--navy);
+      font-size: 13px; letter-spacing: 1px; padding: 11px 10px; margin-top: 14px;
+    }
+    .btn-ghost:active { box-shadow: none; transform: translateY(3px); }
+    .sticky-cta { position: sticky; bottom: 14px; z-index: 5; width: 100%; }
+    .hint { font-size: 12px; font-weight: 700; color: var(--muted); margin-top: 12px; line-height: 1.5; }
+
+    .confirm-box {
+      width: 100%; background: var(--cream-l);
+      border: 2px dashed var(--navy); border-radius: 10px;
+      padding: 18px 12px; margin-bottom: 18px;
+      font-size: 15px; font-weight: 700; line-height: 1.7;
+    }
+    .confirm-box strong { background: var(--navy); color: var(--cream); padding: 1px 6px; border-radius: 4px; }
+
+    /* ---------- 拉霸機 ---------- */
+    .machine-area { width: 100%; display: flex; align-items: flex-start; gap: 4px; margin: 18px 0 22px; }
+
+    .machine {
+      flex: 1; min-width: 0; position: relative;
+      background: var(--navy);
+      border-radius: 22px 22px 12px 12px;
+      padding: 34px 20px 24px;
+      box-shadow: inset 0 -6px 0 var(--navy-d), 0 9px 0 var(--navy-d), 0 18px 28px rgba(0, 0, 0, 0.25);
+    }
+    .machine.shake { animation: shake 0.45s; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-3px) rotate(-0.5deg); }
+      40% { transform: translateX(3px) rotate(0.5deg); }
+      60% { transform: translateX(-2px); }
+      80% { transform: translateX(2px); }
+    }
+
+    .plate {
+      position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+      background: var(--red); color: var(--cream);
+      border: 3px solid var(--gold); border-radius: 30px;
+      padding: 5px 18px; white-space: nowrap;
+      font-size: 15px; font-weight: 900; letter-spacing: 3px;
+      box-shadow: 0 4px 0 #a51f2a; z-index: 4;
+    }
+
+    .bulbs { position: absolute; inset: 11px; pointer-events: none; }
+    .bulb {
+      position: absolute; width: 9px; height: 9px; border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--gold); opacity: 0.3;
+      animation: bulb 1.4s infinite;
+      animation-delay: calc(var(--i) * -0.12s);
+    }
+    .bulb.r { background: var(--red); }
+    .bulb.c { background: var(--cream); }
+    .machine.spinning .bulb { animation-duration: 0.45s; }
+    @keyframes bulb {
+      0%, 100% { opacity: 0.3; box-shadow: none; }
+      50% { opacity: 1; box-shadow: 0 0 9px currentColor, 0 0 3px #fff; }
+    }
+    .bulb { color: var(--gold); }
+    .bulb.r { color: var(--red); }
+    .bulb.c { color: var(--cream); }
+
+    .window {
+      position: relative;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
+      background: var(--navy-d);
+      border: 3px solid var(--gold); border-radius: 10px;
+      padding: 5px;
+    }
+    .reel {
+      position: relative; height: calc(var(--cell) * 1.6);
+      overflow: hidden; background: var(--cream-l); border-radius: 5px;
+    }
+    .reel::before, .reel::after {
+      content: ""; position: absolute; left: 0; right: 0; height: 26px; z-index: 2; pointer-events: none;
+    }
+    .reel::before { top: 0; background: linear-gradient(var(--cream-l), rgba(239, 235, 224, 0)); }
+    .reel::after { bottom: 0; background: linear-gradient(rgba(239, 235, 224, 0), var(--cream-l)); }
+    .strip { position: absolute; left: 0; right: 0; top: 0; will-change: transform; }
+    .cell { height: var(--cell); padding: 5px; }
+    .cell .face { width: 100%; height: 100%; font-size: 15px; padding: 0 2px; }
+    .cell.win .face { animation: winflash 0.25s step-end 6; box-shadow: 0 0 0 3px var(--gold), 0 0 14px var(--gold); }
+    @keyframes winflash { 50% { filter: brightness(1.5); } }
+
+    .payline {
+      position: absolute; left: -9px; right: -9px; top: 50%; height: 3px; margin-top: -1.5px;
+      background: var(--red); z-index: 3; pointer-events: none; opacity: 0.85;
+    }
+    .payline::before, .payline::after {
+      content: ""; position: absolute; top: 50%; transform: translateY(-50%);
+      border-top: 7px solid transparent; border-bottom: 7px solid transparent;
+    }
+    .payline::before { left: 0; border-left: 9px solid var(--red); }
+    .payline::after { right: 0; border-right: 9px solid var(--red); }
+
+    /* 拉桿 */
+    .lever {
+      width: 30px; height: 190px; position: relative; flex-shrink: 0;
+      margin-top: 38px; cursor: pointer; border: none; background: none; padding: 0;
+    }
+    .lever .base {
+      position: absolute; left: 0; bottom: 0; width: 26px; height: 44px;
+      background: var(--navy); border-radius: 0 8px 8px 0;
+      box-shadow: inset -4px 0 0 var(--navy-d);
+    }
+    .lever .arm {
+      position: absolute; left: 9px; bottom: 30px; width: 8px; height: 118px;
+      background: linear-gradient(90deg, #8d93ad, #f2f2f6 45%, #8d93ad);
+      border-radius: 4px; transform-origin: 50% 100%;
+      transform: perspective(380px) rotateX(0deg);
+    }
+    .lever .knob {
+      position: absolute; left: 50%; top: -24px; width: 30px; height: 30px; margin-left: -15px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #ff9aa1, var(--red) 55%, #a51f2a);
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    }
+    .lever.pull .arm { animation: pull 0.7s ease-in-out; }
+    @keyframes pull {
+      0% { transform: perspective(380px) rotateX(0deg); }
+      45% { transform: perspective(380px) rotateX(155deg); }
+      100% { transform: perspective(380px) rotateX(0deg); }
+    }
+    .lever:disabled { cursor: default; }
+
+    /* ---------- 兌獎券 ---------- */
+    .ticket {
+      position: relative; width: 100%;
+      background: var(--cream-l);
+      border: 3px solid var(--navy); border-radius: 14px;
+      box-shadow: 5px 5px 0 var(--navy);
+      padding: 26px 16px 16px; margin: 14px 0 18px;
+    }
+    .stamp {
+      position: absolute; top: -18px; left: 50%;
+      background: var(--red); color: var(--cream);
+      border: 3px solid var(--gold); border-radius: 8px;
+      padding: 5px 18px; white-space: nowrap;
+      font-size: 20px; font-weight: 900; letter-spacing: 4px;
+      box-shadow: 0 4px 0 #a51f2a;
+      transform: translateX(-50%) rotate(-3deg);
+      animation: stampIn 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+    }
+    @keyframes stampIn {
+      from { transform: translateX(-50%) rotate(-3deg) scale(2.4); opacity: 0; }
+      to { transform: translateX(-50%) rotate(-3deg) scale(1); opacity: 1; }
+    }
+    .t-photo {
+      width: 150px; aspect-ratio: 1 / 1; margin: 6px auto 12px;
+      font-size: 24px; border-radius: 12px;
+      box-shadow: 0 0 0 4px var(--gold), 0 0 0 6px var(--navy);
+      animation: popIn 0.5s 0.15s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+    }
+    @keyframes popIn { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .res-name { font-size: 27px; font-weight: 900; letter-spacing: 1px; margin: 0 0 4px; }
+    .res-value { font-size: 14px; font-weight: 800; color: var(--muted); margin: 0; }
+    .perf { position: relative; border-top: 2px dashed var(--navy); margin: 16px -16px 14px; }
+    .perf::before, .perf::after {
+      content: ""; position: absolute; top: -12px; width: 22px; height: 22px; border-radius: 50%;
+      background: var(--cream); border: 3px solid var(--navy);
+    }
+    .perf::before { left: -14px; clip-path: inset(0 0 0 50%); }
+    .perf::after { right: -14px; clip-path: inset(0 50% 0 0); }
+    .res-note { font-size: 13px; font-weight: 700; line-height: 1.6; margin: 0 0 12px; }
+    .timebox {
+      display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin: 0;
+      text-align: left; font-size: 13px; font-weight: 700;
+      background: rgba(31, 36, 77, 0.07); border-radius: 8px; padding: 10px 12px;
+    }
+    .timebox dt { color: var(--muted); }
+    .timebox dd { margin: 0; font-variant-numeric: tabular-nums; }
+    .live-dot {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--red); margin-right: 6px; vertical-align: 1px;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .show-staff {
+      width: 100%; background: var(--navy); color: var(--cream);
+      font-size: 15px; font-weight: 900; letter-spacing: 1px;
+      padding: 13px 8px; border-radius: 10px; box-shadow: 0 5px 0 var(--navy-d);
+    }
+
+    /* ---------- 底部 ---------- */
+    .footer { margin-top: 18px; display: flex; gap: 8px; }
+    .social-btn {
+      flex: 1; padding: 10px 0; text-align: center; text-decoration: none;
+      color: var(--navy); font-size: 12px; font-weight: 900; letter-spacing: 1px;
+      border: 2px solid var(--navy); border-radius: 20px;
+    }
+
+    #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ticker-inner, .bulb { animation: none; }
+      .bulb { opacity: 0.8; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+
+<div class="frame">
+  <div class="ticker"><div class="ticker-inner" id="ticker"></div></div>
+
+  <div class="header">
+    <img src="images/logo.webp" class="logo" alt="筷炒 KUAI CHAO" width="96" height="96">
+  </div>
+
+  <div class="steps" aria-hidden="true">
+    <div class="step" data-step="1">① 加入會員</div>
+    <div class="step" data-step="2">② 拉霸</div>
+    <div class="step" data-step="3">③ 兌換</div>
+  </div>
+
+  <!-- 場景 1：活動說明 + 加入會員 -->
+  <section class="scene" id="scene-intro">
+    <h1>加入會員<br><em>拉霸抽好禮</em></h1>
+    <p class="lead">人人有獎！加入筷炒 Ocard 會員<br>就能拉一次，好菜直接帶回桌上</p>
+
+    <div class="section-title">本期好禮</div>
+    <ul class="prize-grid" id="prizeList"></ul>
+
+    <div class="rules"><ul id="rulesList"></ul></div>
+
+    <div class="sticky-cta">
+      <a class="btn" id="joinBtn" target="_blank" rel="noopener">加入會員・前往 Ocard</a>
+    </div>
+    <div class="hint">完成加入後，請回到此頁面繼續拉霸</div>
+  </section>
+
+  <!-- 場景 2：確認已加入 -->
+  <section class="scene" id="scene-confirm">
+    <h1>完成加入了嗎？</h1>
+    <p class="lead">只差一步就能拉霸了</p>
+    <div class="confirm-box">
+      請將 <strong>Ocard 會員畫面</strong><br>出示給服務人員確認<br>確認後即可開始拉霸
+    </div>
+    <button class="btn" id="toSlotBtn">我已加入，開始拉霸</button>
+    <a class="btn btn-ghost" id="rejoinBtn" target="_blank" rel="noopener">還沒加入？重新開啟 Ocard</a>
+  </section>
+
+  <!-- 場景 3：拉霸機 -->
+  <section class="scene" id="scene-slot">
+    <h1>拉下拉桿！</h1>
+    <p class="lead">每桌限拉一次，三格連線人人有獎</p>
+
+    <div class="machine-area">
+      <div class="machine" id="machine">
+        <div class="plate">筷炒好禮機</div>
+        <div class="bulbs" id="bulbs"></div>
+        <div class="window">
+          <div class="reel"><div class="strip" id="strip0"></div></div>
+          <div class="reel"><div class="strip" id="strip1"></div></div>
+          <div class="reel"><div class="strip" id="strip2"></div></div>
+          <div class="payline"></div>
+        </div>
+      </div>
+      <button class="lever" id="lever" aria-label="拉下拉桿">
+        <span class="base"></span>
+        <span class="arm"><span class="knob"></span></span>
+      </button>
+    </div>
+
+    <button class="btn" id="spinBtn">拉下拉桿・開始抽獎</button>
+  </section>
+
+  <!-- 場景 4：兌獎券 -->
+  <section class="scene" id="scene-result">
+    <div class="ticket">
+      <div class="stamp">恭喜獲得</div>
+      <div class="t-photo face" id="resPhoto"><span id="resPhotoText"></span></div>
+      <p class="res-name" id="resName"></p>
+      <p class="res-value" id="resValue"></p>
+      <div class="perf"></div>
+      <p class="res-note" id="resNote"></p>
+      <dl class="timebox">
+        <dt>抽獎時間</dt><dd id="drawTime"></dd>
+        <dt>現在時間</dt><dd><span class="live-dot"></span><span id="nowTime"></span></dd>
+      </dl>
+    </div>
+    <div class="show-staff">請將此畫面出示給服務人員兌換</div>
+    <div class="hint">限本次消費當場使用・品項如遇售完以等值品項替換</div>
+  </section>
+
+  <div class="footer">
+    <a href="https://www.facebook.com/KUAICHAO.TAIPEI/photos" target="_blank" rel="noopener" class="social-btn">FACEBOOK</a>
+    <a href="https://www.instagram.com/kuaichao.taibei/" target="_blank" rel="noopener" class="social-btn">INSTAGRAM</a>
+  </div>
+</div>
+
+<script>
+  /* ============================================================
+     活動設定（日後調整只需改這一區）
+     ============================================================ */
+  const OCARD_URL = "https://ocard.co/w/x26dqx?m=invite_page&s=Znpg9x";
+  const STORAGE_KEY = "kuaichao_member_slot_v1";
+  const IMG_DIR = "images/";   // 照片放在與 index.html 同層的 images 資料夾
+
+  // name：完整品名 / short：拉霸格子上的簡稱 / value：價值
+  // type：drink 飲品、cash 現金折抵、dish 菜品（決定兌換說明）
+  // img：照片檔名（檔案不存在時自動顯示文字）
+  // enabled：改成 false 就不會被抽到
+  const PRIZES = [
+    { name: "全品項無酒精飲品", short: "飲品<br>一杯",  value: 200, type: "drink", img: "01-drink.webp",            enabled: true },
+    { name: "200 元現金折抵",   short: "現折<br>$200", value: 200, type: "cash",  img: "02-cash200.webp",          enabled: true },
+    { name: "菜脯玉子燒",       short: "玉子燒",        value: 230, type: "dish",  img: "03-tamagoyaki.webp",       enabled: true },
+    { name: "香脆花雕雞",       short: "花雕雞",        value: 388, type: "dish",  img: "04-huadiao-chicken.webp",  enabled: true },
+    { name: "紅通通鯛魚片",     short: "鯛魚片",        value: 388, type: "dish",  img: "05-snapper.webp",          enabled: true },
+    { name: "肉絲炒水蓮",       short: "炒水蓮",        value: 285, type: "dish",  img: "06-water-lotus.webp",      enabled: true },
+    { name: "南洋香酥蟹",       short: "香酥蟹",        value: 488, type: "dish",  img: "07-crab.webp",             enabled: true },
+    { name: "古早味炒米粉",     short: "炒米粉",        value: 330, type: "dish",  img: "08-rice-noodle.webp",      enabled: true },
+    { name: "芋棗",             short: "芋棗",          value: 180, type: "dish",  img: "09-taro-ball.webp",        enabled: true },
+    { name: "煙燻黑雪魚",       short: "黑雪魚",        value: 488, type: "dish",  img: "10-black-cod.webp",        enabled: true }
+  ];
+
+  const RULES = [
+    "本次單筆消費滿 NT$2,000 即可參加，每桌限拉一次",
+    "須加入筷炒 Ocard 會員，並出示會員畫面給服務人員",
+    "獎項限本次消費當場使用",
+    "菜品若本次已點同一道菜，則直接折抵該道菜",
+    "品項如遇售完，以等值品項替換"
+  ];
+
+  const NOTES = {
+    drink: "全品項無酒精飲品任選 1 杯",
+    cash:  "本次消費現折 200 元",
+    dish:  "招待 1 份；若本次已點同一道菜，則直接折抵該道菜"
+  };
+
+  /* ============================================================
+     狀態儲存（localStorage 失效時退回記憶體）
+     ============================================================ */
+  const store = {
+    mem: null,
+    get() {
+      try { const v = localStorage.getItem(STORAGE_KEY); return v ? JSON.parse(v) : this.mem; }
+      catch (e) { return this.mem; }
+    },
+    set(v) {
+      this.mem = v;
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(v)); } catch (e) {}
+    },
+    clear() {
+      this.mem = null;
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    }
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const N = PRIZES.length;
+  const LOOPS = 7;
+  const REDUCED = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // 三個滾輪的排列順序錯開，看起來不會一模一樣
+  const ORDERS = [0, 3, 6].map(shift => PRIZES.map((_, i) => (i + shift) % N));
+  const reelPos = [2, 5, 8];   // 每個滾輪目前停在 strip 的第幾格
+
+  function faceClass(i) {
+    if (PRIZES[i].type === "cash") return "face coin";
+    return i % 2 === 0 ? "face" : "face alt";
+  }
+  function faceHTML(i, extra = "") {
+    return `<div class="${faceClass(i)} ${extra}" data-face="${i}"><span>${PRIZES[i].short}</span></div>`;
+  }
+
+  /* ---------- 建立畫面 ---------- */
+  function buildStatic() {
+    const names = PRIZES.map(p => p.name).join("<b>★</b>") + "<b>★</b>";
+    $("ticker").innerHTML = names + names;
+
+    $("prizeList").innerHTML = PRIZES.map((p, i) => `
+      <li class="pcard">
+        ${faceHTML(i)}
+        <div class="nm">${p.name}</div>
+        <div class="vl">價值 NT$${p.value}</div>
+      </li>`).join("");
+
+    $("rulesList").innerHTML = RULES.map(r => `<li>${r}</li>`).join("");
+    $("joinBtn").href = OCARD_URL;
+    $("rejoinBtn").href = OCARD_URL;
+
+    // 滾輪
+    ORDERS.forEach((order, r) => {
+      let html = "";
+      for (let l = 0; l < LOOPS; l++) {
+        html += order.map(i => `<div class="cell" data-p="${i}">${faceHTML(i)}</div>`).join("");
+      }
+      $("strip" + r).innerHTML = html;
+    });
+
+    // 跑馬燈燈泡：上 9、右 6、下 9、左 6
+    const pts = [];
+    const side = (n, f) => { for (let k = 0; k < n; k++) pts.push(f(k / (n - 1))); };
+    side(9, t => [t * 100, 0]);
+    side(6, t => [100, t * 100]);
+    side(9, t => [100 - t * 100, 100]);
+    side(6, t => [0, 100 - t * 100]);
+    const seen = new Set();
+    $("bulbs").innerHTML = pts.filter(([x, y]) => {
+      const k = Math.round(x) + "," + Math.round(y);
+      if (seen.has(k)) return false; seen.add(k); return true;
+    }).map(([x, y], i) => {
+      const cls = i % 3 === 1 ? "bulb r" : i % 3 === 2 ? "bulb c" : "bulb";
+      return `<span class="${cls}" style="left:${x}%;top:${y}%;--i:${i}"></span>`;
+    }).join("");
+  }
+
+  /* ---------- 照片：檔案存在才顯示，不存在就保留文字 ---------- */
+  const imgLoaded = {};
+  function applyImage(i) {
+    document.querySelectorAll(`[data-face="${i}"]`).forEach(face => {
+      if (face.querySelector("img")) return;
+      const img = document.createElement("img");
+      img.src = IMG_DIR + PRIZES[i].img;
+      img.alt = "";
+      face.prepend(img);
+      face.classList.add("has-img");
+    });
+  }
+  function probeImages() {
+    PRIZES.forEach((p, i) => {
+      const im = new Image();
+      im.onload = () => { imgLoaded[i] = true; applyImage(i); };
+      im.src = IMG_DIR + p.img;
+    });
+  }
+
+  /* ---------- 場景切換 ---------- */
+  const SCENE_STEP = { intro: 1, confirm: 1, slot: 2, result: 3 };
+  function show(scene) {
+    document.querySelectorAll(".scene").forEach(s => s.classList.remove("active"));
+    $("scene-" + scene).classList.add("active");
+    const cur = SCENE_STEP[scene];
+    document.querySelectorAll(".step").forEach(el => {
+      const n = Number(el.dataset.step);
+      el.classList.toggle("on", n === cur);
+      el.classList.toggle("done", n < cur);
+    });
+    window.scrollTo(0, 0);
+    if (scene === "slot") placeReels();
+  }
+
+  /* ---------- 滾輪定位 ---------- */
+  function offsetFor(r, pos) {
+    const strip = $("strip" + r);
+    const cellH = strip.firstElementChild.offsetHeight;
+    const winH = strip.parentElement.clientHeight;
+    return -(pos * cellH) + (winH - cellH) / 2;
+  }
+  function placeReels() {
+    for (let r = 0; r < 3; r++) {
+      const s = $("strip" + r);
+      s.style.transition = "none";
+      s.style.transform = `translateY(${offsetFor(r, reelPos[r])}px)`;
+    }
+  }
+  window.addEventListener("resize", () => {
+    if ($("scene-slot").classList.contains("active") && !spinning) placeReels();
+  });
+
+  /* ---------- 公平抽獎（每個啟用品項機率相同） ---------- */
+  function randInt(n) {
+    if (window.crypto && crypto.getRandomValues) {
+      const buf = new Uint32Array(1);
+      const limit = Math.floor(0x100000000 / n) * n;
+      let x;
+      do { crypto.getRandomValues(buf); x = buf[0]; } while (x >= limit);
+      return x % n;
+    }
+    return Math.floor(Math.random() * n);
+  }
+  function draw() {
+    const pool = PRIZES.map((p, i) => p.enabled ? i : -1).filter(i => i >= 0);
+    return pool[randInt(pool.length)];
+  }
+
+  /* ---------- 拉霸 ---------- */
+  let spinning = false;
+  function spin() {
+    if (spinning) return;              // 防止連點
+    spinning = true;
+    $("spinBtn").disabled = true;
+    $("lever").disabled = true;
+    $("spinBtn").textContent = "轉動中…";
+
+    const idx = draw();
+    const state = { step: "result", idx, ts: Date.now() };
+    store.set(state);                  // 先存結果再播動畫：中途重新整理也不能重拉
+
+    const machine = $("machine");
+    machine.classList.remove("shake"); void machine.offsetWidth; machine.classList.add("shake");
+    machine.classList.add("spinning");
+    const lever = $("lever");
+    lever.classList.remove("pull"); void lever.offsetWidth; lever.classList.add("pull");
+
+    // 三輪依序停下，第三輪刻意拉長製造期待感
+    const durations = REDUCED ? [600, 800, 1000] : [2100, 2800, 4100];
+    const targets = [];
+    for (let r = 0; r < 3; r++) {
+      const s = $("strip" + r);
+      const start = reelPos[r] % N;                       // 回到第一圈的同一格（畫面不跳動）
+      const target = (LOOPS - 1) * N + ORDERS[r].indexOf(idx);
+      targets.push(target);
+      s.style.transition = "none";
+      s.style.transform = `translateY(${offsetFor(r, start)}px)`;
+      void s.offsetHeight;
+      s.style.transition = `transform ${durations[r]}ms cubic-bezier(0.12, 0.72, 0.22, 1.04)`;
+      s.style.transform = `translateY(${offsetFor(r, target)}px)`;
+      reelPos[r] = target;
+    }
+
+    const end = durations[2] + 250;
+    setTimeout(() => {
+      machine.classList.remove("spinning");
+      for (let r = 0; r < 3; r++) $("strip" + r).children[targets[r]].classList.add("win");
+    }, end);
+    setTimeout(() => { renderResult(state); confetti(); }, end + 1500);
+  }
+
+  /* ---------- 結果 ---------- */
+  function fmt(d) {
+    const p = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}/${p(d.getMonth() + 1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  }
+  let clockTimer = null;
+  function renderResult(state) {
+    const i = state.idx;
+    const p = PRIZES[i];
+    const photo = $("resPhoto");
+    photo.className = faceClass(i) + " t-photo";
+    photo.dataset.face = i;
+    photo.querySelectorAll("img").forEach(el => el.remove());
+    $("resPhotoText").innerHTML = p.short;
+    if (imgLoaded[i]) applyImage(i);
+
+    $("resName").textContent = p.name;
+    $("resValue").textContent = `價值 NT$${p.value}`;
+    $("resNote").textContent = NOTES[p.type];
+    $("drawTime").textContent = fmt(new Date(state.ts));
+    const tick = () => { $("nowTime").textContent = fmt(new Date()); };
+    tick();
+    clearInterval(clockTimer);
+    clockTimer = setInterval(tick, 1000);
+    show("result");
+  }
+
+  /* ---------- 彩帶 ---------- */
+  function confetti() {
+    if (REDUCED) return;
+    const cv = $("confetti");
+    const ctx = cv.getContext("2d");
+    const dpr = window.devicePixelRatio || 1;
+    const W = innerWidth, H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.scale(dpr, dpr);
+    const colors = ["#1f244d", "#dfdacb", "#e63946", "#f2b632", "#f2b632"];
+    const parts = Array.from({ length: 150 }, () => ({
+      x: W / 2 + (Math.random() - 0.5) * 60,
+      y: H * 0.32,
+      vx: (Math.random() - 0.5) * 13,
+      vy: -Math.random() * 13 - 4,
+      w: 6 + Math.random() * 6,
+      h: 9 + Math.random() * 8,
+      rot: Math.random() * Math.PI,
+      vr: (Math.random() - 0.5) * 0.35,
+      c: colors[Math.floor(Math.random() * colors.length)]
+    }));
+    const t0 = performance.now();
+    (function frame(t) {
+      const el = t - t0;
+      ctx.clearRect(0, 0, W, H);
+      parts.forEach(p => {
+        p.vy += 0.32; p.vx *= 0.99; p.vy *= 0.99;
+        p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, 1 - el / 3600);
+        ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+        ctx.fillStyle = p.c;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.rot * 2)));
+        ctx.restore();
+      });
+      if (el < 3600) requestAnimationFrame(frame);
+      else ctx.clearRect(0, 0, W, H);
+    })(t0);
+  }
+
+  /* ---------- 流程 ---------- */
+  $("joinBtn").addEventListener("click", () => {
+    store.set({ step: "confirm" });
+    setTimeout(() => show("confirm"), 300);
+  });
+  $("toSlotBtn").addEventListener("click", () => {
+    store.set({ step: "slot" });
+    show("slot");
+  });
+  $("spinBtn").addEventListener("click", spin);
+  $("lever").addEventListener("click", spin);
+
+  /* ---------- 啟動 ---------- */
+  window.addEventListener("load", () => {
+    buildStatic();
+    probeImages();
+
+    // 測試用：網址加上 ?reset=1 可清除紀錄重新玩
+    const params = new URLSearchParams(location.search);
+    if (params.has("reset")) {
+      store.clear();
+      history.replaceState(null, "", location.pathname);
+    }
+
+    const state = store.get();
+    if (state && state.step === "result" && PRIZES[state.idx]) renderResult(state);
+    else if (state && state.step === "slot") show("slot");
+    else if (state && state.step === "confirm") show("confirm");
+    else show("intro");
+  });
+</script>
+
+</body>
+</html>
