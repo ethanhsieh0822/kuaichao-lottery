@@ -18,7 +18,8 @@
       --red: #e63946;
       --gold: #f2b632;
       --muted: rgba(31, 36, 77, 0.68);
-      --cell: 84px;
+      --cell: 150px;
+      --gap: 3px;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -38,14 +39,21 @@
     }
 
     .frame {
+      position: relative;
       width: calc(100% - 32px);
       max-width: 390px;
+      padding: 0 16px 18px;
+    }
+    /* 外框底色獨立一層：飄散紙花夾在底色與內容之間，不會蓋住文字 */
+    .frame-bg {
+      position: absolute; inset: 0; z-index: 0;
       background: var(--cream);
       border-radius: 10px;
       box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
-      padding: 0 16px 18px;
-      overflow: hidden;
     }
+    .frame > :not(.frame-bg) { position: relative; z-index: 2; }
+    .frame > .ticker { border-radius: 10px 10px 0 0; }
+    #ambient { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
 
     /* ---------- 跑馬燈文字 ---------- */
     .ticker {
@@ -114,26 +122,47 @@
       color: var(--navy); box-shadow: inset 0 0 0 2px var(--navy);
     }
     .face img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .face.has-img span {
-      position: absolute; left: 0; right: 0; bottom: 0; z-index: 1;
-      background: rgba(31, 36, 77, 0.82); color: var(--cream);
-      font-size: 11px !important; padding: 3px 2px;
-    }
+    .face.has-img span { display: none; }   /* 有照片就只顯示照片，不重複文字 */
 
     /* ---------- 獎項卡片 ---------- */
-    .prize-grid {
-      list-style: none; margin: 0 0 16px; padding: 0; width: 100%;
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+    .showcase {
+      position: relative; width: calc(100% + 8px); margin: 6px -4px 18px;
+      background: var(--navy);
+      border-radius: 18px;
+      padding: 22px 0 22px;
+      box-shadow: inset 0 -5px 0 var(--navy-d), 0 7px 0 var(--navy-d), 0 14px 24px rgba(0, 0, 0, 0.22);
     }
+    .showcase .bulbs { inset: 9px; }
+    .showcase-window {
+      margin: 0 14px; padding: 8px 0;
+      background: var(--navy-d);
+      border: 3px solid var(--gold); border-radius: 10px;
+      overflow: hidden;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .marquee {
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+              mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+    .track {
+      display: flex; gap: 8px; width: max-content;
+      list-style: none; margin: 0; padding: 0 4px;
+      animation: flow 30s linear infinite;
+    }
+    .marquee.rev .track { animation-direction: reverse; animation-duration: 34s; }
+    .marquee:active .track { animation-play-state: paused; }   /* 手指按住可暫停細看 */
+    @keyframes flow { from { transform: translateX(0); } to { transform: translateX(-50%); } }
     .pcard {
-      background: var(--cream-l); border: 2px solid var(--navy); border-radius: 8px;
-      overflow: hidden; box-shadow: 3px 3px 0 var(--navy);
+      width: 132px; flex-shrink: 0;
+      background: var(--cream-l); border-radius: 8px;
+      overflow: hidden;
     }
     .pcard .face { aspect-ratio: 16 / 10; border-radius: 0; font-size: 17px; box-shadow: none; }
     .pcard .face br { display: none; }
-    .pcard .face.alt { box-shadow: none; border-bottom: 2px solid var(--navy); }
-    .pcard .nm { font-size: 13px; font-weight: 900; padding: 7px 3px 1px; line-height: 1.3; }
-    .pcard .vl { font-size: 11px; font-weight: 700; color: var(--muted); padding-bottom: 6px; }
+    .pcard .face.alt { box-shadow: none; }
+    .pcard .nm { font-size: 13px; font-weight: 900; padding: 8px 4px; line-height: 1.3; white-space: nowrap; }
+    .showcase-tip { font-size: 11px; font-weight: 800; color: var(--muted); margin: -8px 0 16px; }
 
     /* ---------- 活動說明 ---------- */
     .rules {
@@ -224,29 +253,41 @@
 
     .window {
       position: relative;
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap);
       background: var(--navy-d);
       border: 3px solid var(--gold); border-radius: 10px;
-      padding: 5px;
+      padding: 4px;
+      transition: box-shadow 0.3s;
     }
+    .window.win { box-shadow: 0 0 0 3px var(--gold), 0 0 26px 6px rgba(242, 182, 50, 0.85); }
     .reel {
-      position: relative; height: calc(var(--cell) * 1.6);
-      overflow: hidden; background: var(--cream-l); border-radius: 5px;
+      position: relative; height: calc(var(--cell) * 1.3);
+      overflow: hidden; background: var(--navy-d);
     }
+    .reel:first-child { border-radius: 6px 0 0 6px; }
+    .reel:last-child { border-radius: 0 6px 6px 0; }
+    /* 上下陰影，營造滾筒的弧面感 */
     .reel::before, .reel::after {
-      content: ""; position: absolute; left: 0; right: 0; height: 26px; z-index: 2; pointer-events: none;
+      content: ""; position: absolute; left: 0; right: 0; height: 22%; z-index: 2; pointer-events: none;
     }
-    .reel::before { top: 0; background: linear-gradient(var(--cream-l), rgba(239, 235, 224, 0)); }
-    .reel::after { bottom: 0; background: linear-gradient(rgba(239, 235, 224, 0), var(--cream-l)); }
+    .reel::before { top: 0; background: linear-gradient(rgba(10, 12, 30, 0.85), rgba(10, 12, 30, 0)); }
+    .reel::after { bottom: 0; background: linear-gradient(rgba(10, 12, 30, 0), rgba(10, 12, 30, 0.85)); }
     .strip { position: absolute; left: 0; right: 0; top: 0; will-change: transform; }
-    .cell { height: var(--cell); padding: 5px; }
-    .cell .face { width: 100%; height: 100%; font-size: 15px; padding: 0 2px; }
-    .cell.win .face { animation: winflash 0.25s step-end 6; box-shadow: 0 0 0 3px var(--gold), 0 0 14px var(--gold); }
-    @keyframes winflash { 50% { filter: brightness(1.5); } }
+    .cell { position: relative; height: var(--cell); overflow: hidden; border-bottom: 3px solid var(--navy-d); }
+    /* 每格只露出整張圖的 1/3：第 r 輪顯示左、中、右段 */
+    .slice {
+      position: absolute; top: 0; height: 100%;
+      width: calc(300% + 2 * var(--gap));
+      left: calc(var(--r) * -1 * (100% + var(--gap)));
+    }
+    .slice .face { width: 100%; height: 100%; border-radius: 0; font-size: 30px; box-shadow: none; }
+    .slice .face br { display: none; }
+    .cell.win { animation: winflash 0.25s step-end 6; }
+    @keyframes winflash { 50% { filter: brightness(1.45); } }
 
     .payline {
-      position: absolute; left: -9px; right: -9px; top: 50%; height: 3px; margin-top: -1.5px;
-      background: var(--red); z-index: 3; pointer-events: none; opacity: 0.85;
+      position: absolute; left: -9px; right: -9px; top: 50%; height: 0;
+      z-index: 3; pointer-events: none;
     }
     .payline::before, .payline::after {
       content: ""; position: absolute; top: 50%; transform: translateY(-50%);
@@ -257,33 +298,105 @@
 
     /* 拉桿 */
     .lever {
-      width: 30px; height: 190px; position: relative; flex-shrink: 0;
-      margin-top: 38px; cursor: pointer; border: none; background: none; padding: 0;
+      width: 46px; height: 270px; position: relative; flex-shrink: 0;
+      margin-top: 0; cursor: grab; border: none; background: none; padding: 0;
+      font-family: inherit;
+      touch-action: none; user-select: none; -webkit-user-select: none;
     }
+    .lever.grab { cursor: grabbing; }
+    .lever.grab .lever-tip, .lever.grab .knob::after { display: none; }
     .lever .base {
-      position: absolute; left: 0; bottom: 0; width: 26px; height: 44px;
-      background: var(--navy); border-radius: 0 8px 8px 0;
-      box-shadow: inset -4px 0 0 var(--navy-d);
+      position: absolute; left: 0; top: 118px; width: 32px; height: 54px;
+      background: var(--navy); border-radius: 0 12px 12px 0;
+      box-shadow: inset -5px 0 0 var(--navy-d);
+    }
+    .lever .base::after {   /* 轉軸 */
+      content: ""; position: absolute; left: 11px; top: 50%; width: 14px; height: 14px; margin-top: -7px;
+      border-radius: 50%; background: #8d93ad; box-shadow: inset 0 2px 2px rgba(0,0,0,0.4);
     }
     .lever .arm {
-      position: absolute; left: 9px; bottom: 30px; width: 8px; height: 118px;
+      position: absolute; left: 13px; width: 10px; top: 46px; height: 99px;
       background: linear-gradient(90deg, #8d93ad, #f2f2f6 45%, #8d93ad);
-      border-radius: 4px; transform-origin: 50% 100%;
-      transform: perspective(380px) rotateX(0deg);
+      border-radius: 5px;
     }
     .lever .knob {
-      position: absolute; left: 50%; top: -24px; width: 30px; height: 30px; margin-left: -15px;
-      border-radius: 50%;
+      position: absolute; left: 50%; top: 26px; width: 40px; height: 40px; margin-left: -20px;
+      border-radius: 50%; z-index: 2;
       background: radial-gradient(circle at 35% 30%, #ff9aa1, var(--red) 55%, #a51f2a);
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
-    .lever.pull .arm { animation: pull 0.7s ease-in-out; }
-    @keyframes pull {
-      0% { transform: perspective(380px) rotateX(0deg); }
-      45% { transform: perspective(380px) rotateX(155deg); }
-      100% { transform: perspective(380px) rotateX(0deg); }
+    /* 拉桿頭的光圈，提示可以拉 */
+    .lever .knob::after {
+      content: ""; position: absolute; inset: -4px; border-radius: 50%;
+      border: 3px solid var(--gold);
+      animation: ring 1.3s ease-out infinite;
     }
+    @keyframes ring {
+      0% { transform: scale(0.9); opacity: 1; }
+      100% { transform: scale(1.9); opacity: 0; }
+    }
+    /* 往下拉的軌跡提示 */
+    .lever .track-hint {
+      position: absolute; left: 50%; top: 74px; margin-left: -6px; width: 12px; height: 180px;
+      background: repeating-linear-gradient(var(--gold) 0 6px, transparent 6px 14px);
+      -webkit-mask-image: linear-gradient(#000, transparent);
+              mask-image: linear-gradient(#000, transparent);
+      opacity: 0.55; border-radius: 6px;
+      animation: trackflow 0.9s linear infinite;
+    }
+    @keyframes trackflow { from { background-position: 0 0; } to { background-position: 0 14px; } }
+    .lever.grab .track-hint, .lever:disabled .track-hint { display: none; }
+    .lever-tip {
+      position: absolute; top: -24px; left: 50%; z-index: 3; margin-left: -29px; width: 58px;
+      background: var(--gold); color: var(--navy);
+      font-size: 14px; font-weight: 900; letter-spacing: 1px;
+      padding: 5px 0; border-radius: 8px; text-align: center;
+      box-shadow: 0 3px 0 #c8901a;
+      animation: bob 0.9s ease-in-out infinite;
+    }
+    .lever-tip::after {
+      content: ""; position: absolute; left: 50%; bottom: -7px; margin-left: -7px;
+      border-left: 7px solid transparent; border-right: 7px solid transparent;
+      border-top: 8px solid var(--gold);
+    }
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+    .lever-tip.nudge { animation: nudge 0.5s ease-in-out 2; }
+    @keyframes nudge { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(10px) scale(1.12); } }
+    .pull-hint.flash b { animation: blink 0.3s step-end 4; }
     .lever:disabled { cursor: default; }
+    .lever:disabled .lever-tip, .lever:disabled .knob::after { display: none; }
+
+    /* 拉到觸發點：紅球亮金邊、底座「咔」一下 */
+    .lever .knob.armed { box-shadow: 0 0 0 4px var(--gold), 0 0 18px 5px rgba(242, 182, 50, 0.9); filter: brightness(1.12); }
+    .lever.clack .base { animation: clack 0.2s ease-out; }
+    @keyframes clack { 0% { transform: none; } 35% { transform: translateY(3px) scaleY(0.96); } 100% { transform: none; } }
+    .pull-hint.go { color: var(--red); animation: pop 0.25s ease-out; }
+    @keyframes pop { 0% { transform: scale(0.9); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+
+    /* 今日已送出計數（LED 字樣） */
+    .counter {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--navy-d); color: var(--cream);
+      border: 2px solid var(--gold); border-radius: 30px;
+      padding: 6px 14px; margin: 0 0 14px;
+      font-size: 13px; font-weight: 800; letter-spacing: 1px;
+      box-shadow: 0 3px 0 var(--navy);
+    }
+    .counter[hidden] { display: none; }
+    .counter .digits {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 18px; font-weight: 900; color: var(--gold); letter-spacing: 2px;
+      text-shadow: 0 0 8px rgba(242, 182, 50, 0.7);
+    }
+    .counter.bump .digits { animation: pop 0.4s ease-out; }
+
+    .ig-btn { margin-top: 16px; }
+
+    .pull-hint {
+      font-size: 15px; font-weight: 900; letter-spacing: 1px; margin: 0;
+      color: var(--navy);
+    }
+    .pull-hint b { color: var(--red); }
 
     /* ---------- 兌獎券 ---------- */
     .ticket {
@@ -355,15 +468,18 @@
 
     @media (prefers-reduced-motion: reduce) {
       .ticker-inner, .bulb { animation: none; }
+      .track { animation-duration: 120s; }
       .bulb { opacity: 0.8; }
     }
   </style>
 </head>
 <body>
 
+<canvas id="ambient"></canvas>
 <canvas id="confetti"></canvas>
 
 <div class="frame">
+  <div class="frame-bg"></div>
   <div class="ticker"><div class="ticker-inner" id="ticker"></div></div>
 
   <div class="header">
@@ -382,7 +498,15 @@
     <p class="lead">人人有獎！加入筷炒 Ocard 會員<br>就能拉一次，好菜直接帶回桌上</p>
 
     <div class="section-title">本期好禮</div>
-    <ul class="prize-grid" id="prizeList"></ul>
+    <div class="showcase">
+      <div class="bulbs" id="showBulbs"></div>
+      <div class="showcase-window">
+        <div class="marquee"><ul class="track" id="row0"></ul></div>
+        <div class="marquee rev"><ul class="track" id="row1"></ul></div>
+      </div>
+    </div>
+    <div class="showcase-tip">按住可暫停查看</div>
+    <div class="counter" data-counter hidden><span data-label>今日已送出</span><span class="digits">0</span>份好禮</div>
 
     <div class="rules"><ul id="rulesList"></ul></div>
 
@@ -405,8 +529,9 @@
 
   <!-- 場景 3：拉霸機 -->
   <section class="scene" id="scene-slot">
-    <h1>拉下拉桿！</h1>
+    <h1>把<em style="background: var(--red)">紅色拉桿</em>往下拉</h1>
     <p class="lead">每桌限拉一次，三格連線人人有獎</p>
+    <div class="counter" data-counter hidden><span data-label>今日已送出</span><span class="digits">0</span>份好禮</div>
 
     <div class="machine-area">
       <div class="machine" id="machine">
@@ -420,12 +545,15 @@
         </div>
       </div>
       <button class="lever" id="lever" aria-label="拉下拉桿">
+        <span class="lever-tip" id="leverTip">往下拉</span>
+        <span class="track-hint"></span>
         <span class="base"></span>
-        <span class="arm"><span class="knob"></span></span>
+        <span class="arm"></span>
+        <span class="knob"></span>
       </button>
     </div>
 
-    <button class="btn" id="spinBtn">拉下拉桿・開始抽獎</button>
+    <p class="pull-hint" id="pullHint">按住<b>紅色圓球</b>，往下拉到底</p>
   </section>
 
   <!-- 場景 4：兌獎券 -->
@@ -434,7 +562,6 @@
       <div class="stamp">恭喜獲得</div>
       <div class="t-photo face" id="resPhoto"><span id="resPhotoText"></span></div>
       <p class="res-name" id="resName"></p>
-      <p class="res-value" id="resValue"></p>
       <div class="perf"></div>
       <p class="res-note" id="resNote"></p>
       <dl class="timebox">
@@ -444,6 +571,7 @@
     </div>
     <div class="show-staff">請將此畫面出示給服務人員兌換</div>
     <div class="hint">限本次消費當場使用・品項如遇售完以等值品項替換</div>
+    <a class="btn btn-ghost ig-btn" href="https://www.instagram.com/kuaichao.taibei/" target="_blank" rel="noopener">追蹤 IG 看更多新菜</a>
   </section>
 
   <div class="footer">
@@ -458,6 +586,11 @@
      ============================================================ */
   const OCARD_URL = "https://ocard.co/w/x26dqx?m=invite_page&s=Znpg9x";
   const STORAGE_KEY = "kuaichao_member_slot_v1";
+
+  // 「今日已送出」計數器：貼上 Google Apps Script 的網址後才會顯示
+  const COUNTER_URL  = "";        // 例如 "https://script.google.com/macros/s/xxxx/exec"
+  const COUNTER_MODE = "today";   // "today" 顯示今日數量；"total" 顯示活動累計
+  const COUNTER_MIN  = 10;        // 數字低於這個值時先不顯示，避免開店時看起來冷清
   const IMG_DIR = "images/";   // 照片放在與 index.html 同層的 images 資料夾
 
   // name：完整品名 / short：拉霸格子上的簡稱 / value：價值
@@ -466,7 +599,7 @@
   // enabled：改成 false 就不會被抽到
   const PRIZES = [
     { name: "全品項無酒精飲品", short: "飲品<br>一杯",  value: 200, type: "drink", img: "01-drink.webp",            enabled: true },
-    { name: "200 元現金折抵",   short: "現折<br>$200", value: 200, type: "cash",  img: "02-cash200.webp",          enabled: true },
+    { name: "200 元現金折抵",   short: "$200", value: 200, type: "cash",  img: "02-cash200.webp",          enabled: true },
     { name: "菜脯玉子燒",       short: "玉子燒",        value: 230, type: "dish",  img: "03-tamagoyaki.webp",       enabled: true },
     { name: "香脆花雕雞",       short: "花雕雞",        value: 388, type: "dish",  img: "04-huadiao-chicken.webp",  enabled: true },
     { name: "紅通通鯛魚片",     short: "鯛魚片",        value: 388, type: "dish",  img: "05-snapper.webp",          enabled: true },
@@ -474,7 +607,7 @@
     { name: "南洋香酥蟹",       short: "香酥蟹",        value: 488, type: "dish",  img: "07-crab.webp",             enabled: true },
     { name: "古早味炒米粉",     short: "炒米粉",        value: 330, type: "dish",  img: "08-rice-noodle.webp",      enabled: true },
     { name: "芋棗",             short: "芋棗",          value: 180, type: "dish",  img: "09-taro-ball.webp",        enabled: true },
-    { name: "煙燻黑雪魚",       short: "黑雪魚",        value: 488, type: "dish",  img: "10-black-cod.webp",        enabled: true }
+    { name: "煙燻黑鱈魚",       short: "黑鱈魚",        value: 488, type: "dish",  img: "10-black-cod.webp",        enabled: true }
   ];
 
   const RULES = [
@@ -532,12 +665,14 @@
     const names = PRIZES.map(p => p.name).join("<b>★</b>") + "<b>★</b>";
     $("ticker").innerHTML = names + names;
 
-    $("prizeList").innerHTML = PRIZES.map((p, i) => `
-      <li class="pcard">
-        ${faceHTML(i)}
-        <div class="nm">${p.name}</div>
-        <div class="vl">價值 NT$${p.value}</div>
-      </li>`).join("");
+    // 兩列各 5 項，複製一份讓流動無縫循環
+    const card = (i) => `<li class="pcard">${faceHTML(i)}<div class="nm">${PRIZES[i].name}</div></li>`;
+    const half = Math.ceil(N / 2);
+    [PRIZES.slice(0, half), PRIZES.slice(half)].forEach((list, r) => {
+      const start = r === 0 ? 0 : half;
+      const html = list.map((_, k) => card(start + k)).join("");
+      $("row" + r).innerHTML = html + html;
+    });
 
     $("rulesList").innerHTML = RULES.map(r => `<li>${r}</li>`).join("");
     $("joinBtn").href = OCARD_URL;
@@ -547,7 +682,7 @@
     ORDERS.forEach((order, r) => {
       let html = "";
       for (let l = 0; l < LOOPS; l++) {
-        html += order.map(i => `<div class="cell" data-p="${i}">${faceHTML(i)}</div>`).join("");
+        html += order.map(i => `<div class="cell" data-p="${i}"><div class="slice" style="--r:${r}">${faceHTML(i)}</div></div>`).join("");
       }
       $("strip" + r).innerHTML = html;
     });
@@ -559,8 +694,16 @@
     side(6, t => [100, t * 100]);
     side(9, t => [100 - t * 100, 100]);
     side(6, t => [0, 100 - t * 100]);
+    $("bulbs").innerHTML = bulbHTML(pts);
+    $("showBulbs").innerHTML = bulbHTML([
+      ...Array.from({ length: 11 }, (_, k) => [k * 10, 0]),
+      ...Array.from({ length: 11 }, (_, k) => [100 - k * 10, 100])
+    ]);
+  }
+
+  function bulbHTML(pts) {
     const seen = new Set();
-    $("bulbs").innerHTML = pts.filter(([x, y]) => {
+    return pts.filter(([x, y]) => {
       const k = Math.round(x) + "," + Math.round(y);
       if (seen.has(k)) return false; seen.add(k); return true;
     }).map(([x, y], i) => {
@@ -602,6 +745,7 @@
     });
     window.scrollTo(0, 0);
     if (scene === "slot") placeReels();
+    if (scene === "result") ambient.stop(); else ambient.start();
   }
 
   /* ---------- 滾輪定位 ---------- */
@@ -643,9 +787,8 @@
   function spin() {
     if (spinning) return;              // 防止連點
     spinning = true;
-    $("spinBtn").disabled = true;
     $("lever").disabled = true;
-    $("spinBtn").textContent = "轉動中…";
+    $("pullHint").textContent = "轉動中…";
 
     const idx = draw();
     const state = { step: "result", idx, ts: Date.now() };
@@ -654,11 +797,12 @@
     const machine = $("machine");
     machine.classList.remove("shake"); void machine.offsetWidth; machine.classList.add("shake");
     machine.classList.add("spinning");
-    const lever = $("lever");
-    lever.classList.remove("pull"); void lever.offsetWidth; lever.classList.add("pull");
 
     // 三輪依序停下，第三輪刻意拉長製造期待感
-    const durations = REDUCED ? [600, 800, 1000] : [2100, 2800, 4100];
+    const durations = REDUCED ? [600, 800, 1000] : [2100, 2900, 3300];
+    const TEASE_PAUSE = 480, TEASE_MOVE = 680;    // 第三輪：先停在半格外，頓一下再滑進正確位置
+    const tease = !REDUCED;
+    const teaseDir = Math.random() < 0.5 ? -0.42 : 0.42;   // 隨機「差一點」或「多跑一點」
     const targets = [];
     for (let r = 0; r < 3; r++) {
       const s = $("strip" + r);
@@ -668,14 +812,25 @@
       s.style.transition = "none";
       s.style.transform = `translateY(${offsetFor(r, start)}px)`;
       void s.offsetHeight;
-      s.style.transition = `transform ${durations[r]}ms cubic-bezier(0.12, 0.72, 0.22, 1.04)`;
-      s.style.transform = `translateY(${offsetFor(r, target)}px)`;
+      if (r === 2 && tease) {
+        s.style.transition = `transform ${durations[r]}ms cubic-bezier(0.15, 0.75, 0.3, 1)`;
+        s.style.transform = `translateY(${offsetFor(r, target + teaseDir)}px)`;
+        setTimeout(() => {
+          s.style.transition = `transform ${TEASE_MOVE}ms cubic-bezier(0.5, 0, 0.3, 1.35)`;
+          s.style.transform = `translateY(${offsetFor(r, target)}px)`;
+        }, durations[r] + TEASE_PAUSE);
+      } else {
+        s.style.transition = `transform ${durations[r]}ms cubic-bezier(0.12, 0.72, 0.22, 1.04)`;
+        s.style.transform = `translateY(${offsetFor(r, target)}px)`;
+      }
       reelPos[r] = target;
     }
+    counter.add(PRIZES[idx].name);
 
-    const end = durations[2] + 250;
+    const end = durations[2] + (tease ? TEASE_PAUSE + TEASE_MOVE : 0) + 250;
     setTimeout(() => {
       machine.classList.remove("spinning");
+      machine.querySelector(".window").classList.add("win");
       for (let r = 0; r < 3; r++) $("strip" + r).children[targets[r]].classList.add("win");
     }, end);
     setTimeout(() => { renderResult(state); confetti(); }, end + 1500);
@@ -698,7 +853,6 @@
     if (imgLoaded[i]) applyImage(i);
 
     $("resName").textContent = p.name;
-    $("resValue").textContent = `價值 NT$${p.value}`;
     $("resNote").textContent = NOTES[p.type];
     $("drawTime").textContent = fmt(new Date(state.ts));
     const tick = () => { $("nowTime").textContent = fmt(new Date()); };
@@ -707,6 +861,82 @@
     clockTimer = setInterval(tick, 1000);
     show("result");
   }
+
+  /* ---------- 背景飄散紙花（夾在外框底色與內容之間，不遮字） ---------- */
+  const ambient = (() => {
+    const cv = $("ambient");
+    const frameEl = document.querySelector(".frame");
+    const ctx = cv.getContext("2d");
+    const colors = ["#e63946", "#f2b632", "#f2b632", "#dfdacb", "#1f244d", "#7fa7d9"];
+    let W = 0, H = 0, parts = [], raf = null, last = 0;
+
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = innerWidth; H = innerHeight;
+      cv.width = W * dpr; cv.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function make(randomY) {
+      const shape = Math.random();
+      return {
+        x: Math.random() * W,
+        y: randomY ? Math.random() * H : -20,
+        s: 5 + Math.random() * 7,
+        vy: 0.45 + Math.random() * 0.9,
+        sway: 0.6 + Math.random() * 1.2,
+        ph: Math.random() * Math.PI * 2,
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 0.08,
+        flip: Math.random() * Math.PI,
+        type: shape < 0.55 ? "rect" : shape < 0.8 ? "circle" : "ribbon",
+        c: colors[Math.floor(Math.random() * colors.length)]
+      };
+    }
+    function frame(t) {
+      const dt = Math.min(2, (t - last) / 16.7 || 1); last = t;
+      ctx.clearRect(0, 0, W, H);
+      const fr = frameEl.getBoundingClientRect();
+      for (const p of parts) {
+        p.ph += 0.02 * dt; p.rot += p.vr * dt; p.flip += 0.06 * dt;
+        p.y += p.vy * dt;
+        p.x += Math.sin(p.ph) * p.sway * 0.5 * dt;
+        if (p.y > H + 20) Object.assign(p, make(false));
+        ctx.save();
+        ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+        // 在外框內調淡，避免干擾閱讀；外框外維持鮮豔
+        const inside = p.x > fr.left && p.x < fr.right && p.y > fr.top && p.y < fr.bottom;
+        ctx.globalAlpha = inside ? 0.42 : 0.9;
+        ctx.fillStyle = p.c;
+        const sx = Math.abs(Math.cos(p.flip));
+        if (p.type === "rect") ctx.fillRect(-p.s / 2, -p.s * 0.35, p.s, p.s * 0.7 * sx + 1);
+        else if (p.type === "circle") { ctx.beginPath(); ctx.ellipse(0, 0, p.s * 0.4, p.s * 0.4 * sx + 0.5, 0, 0, Math.PI * 2); ctx.fill(); }
+        else ctx.fillRect(-p.s * 0.15, -p.s, p.s * 0.3, p.s * 2 * sx + 1);
+        ctx.restore();
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    return {
+      start() {
+        if (REDUCED || raf) return;
+        resize();
+        const count = Math.round(Math.min(110, Math.max(60, W * H / 4500)));
+        parts = Array.from({ length: count }, () => make(true));
+        cv.style.display = "block";
+        last = performance.now();
+        raf = requestAnimationFrame(frame);
+      },
+      stop() {
+        if (raf) cancelAnimationFrame(raf);
+        raf = null; ctx.clearRect(0, 0, W, H); cv.style.display = "none";
+      },
+      resize() { if (raf) resize(); }
+    };
+  })();
+  window.addEventListener("resize", () => ambient.resize());
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) ambient.stop();
+    else if (!$("scene-result").classList.contains("active")) ambient.start();
+  });
 
   /* ---------- 彩帶 ---------- */
   function confetti() {
@@ -757,8 +987,134 @@
     store.set({ step: "slot" });
     show("slot");
   });
-  $("spinBtn").addEventListener("click", spin);
-  $("lever").addEventListener("click", spin);
+  /* ---------- 今日已送出計數器（Google 試算表） ---------- */
+  const counter = (() => {
+    let value = null;
+    const testMode = () => { try { return sessionStorage.getItem("kc_test") === "1"; } catch (e) { return false; } };
+    function render(bump) {
+      const show = value !== null && value >= COUNTER_MIN;
+      document.querySelectorAll("[data-counter]").forEach(el => {
+        el.hidden = !show;
+        el.querySelector("[data-label]").textContent = COUNTER_MODE === "total" ? "活動已送出" : "今日已送出";
+        el.querySelector(".digits").textContent = String(value || 0).padStart(4, "0");
+        if (bump) { el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); }
+      });
+    }
+    async function call(params) {
+      if (!COUNTER_URL) return null;
+      const ctl = new AbortController();
+      const t = setTimeout(() => ctl.abort(), 6000);
+      try {
+        const res = await fetch(COUNTER_URL + "?" + new URLSearchParams(params), { cache: "no-store", signal: ctl.signal });
+        const data = await res.json();
+        return COUNTER_MODE === "total" ? data.total : data.today;
+      } catch (e) { return null; }          // 連不上就安靜略過，不影響抽獎
+      finally { clearTimeout(t); }
+    }
+    return {
+      async load() { const v = await call({ action: "get" }); if (v !== null) { value = v; render(false); } },
+      async add(prize) {
+        if (!COUNTER_URL) return;
+        if (testMode()) { if (value !== null) { value++; render(true); } return; }   // 測試模式不寫入
+        const v = await call({ action: "add", prize });
+        if (v !== null) { value = v; render(true); }
+      }
+    };
+  })();
+
+  /* ---------- 拉桿：按住往下拉到底才會啟動 ---------- */
+  (() => {
+    const lever = $("lever");
+    const arm = lever.querySelector(".arm");
+    const knob = lever.querySelector(".knob");
+    const PULL = 190;          // 手指拉到底的距離（px）；越往下越重
+    const TRIGGER = 0.6;       // 超過 60% 放開就算成功
+    const TOP = 46, BOTTOM = 248, PIVOT = 145;   // 紅球中心的起點、終點，與轉軸位置
+    let drag = null, cur = 0, anim = null;
+    function setArm(p) {
+      cur = p;
+      const ky = TOP + (BOTTOM - TOP) * p;
+      arm.style.top = Math.min(ky, PIVOT) + "px";
+      arm.style.height = Math.max(4, Math.abs(PIVOT - ky)) + "px";
+      knob.style.top = (ky - 20) + "px";
+      knob.style.transform = `scale(${1 + 0.22 * Math.sin(Math.PI * p)})`;   // 經過中間時靠近鏡頭
+    }
+    function tween(to, ms, ease, done) {
+      cancelAnimationFrame(anim);
+      const from = cur, t0 = performance.now();
+      (function step(t) {
+        const k = Math.min(1, (t - t0) / ms);
+        setArm(from + (to - from) * ease(k));
+        if (k < 1) anim = requestAnimationFrame(step); else if (done) done();
+      })(t0);
+    }
+    const easeIn = (k) => k * k;
+    const springOut = (k) => 1 + 2.2 * Math.pow(k - 1, 3) + 1.2 * Math.pow(k - 1, 2);   // 回彈略微超過
+    const springBack = (ms) => tween(0, ms, springOut);
+    setArm(0);
+    const hintHTML = $("pullHint").innerHTML;
+    function armed(on) {
+      knob.classList.toggle("armed", on);
+      const hint = $("pullHint");
+      if (on) {
+        lever.classList.remove("clack"); void lever.offsetWidth; lever.classList.add("clack");
+        hint.textContent = "放開！";
+        hint.classList.remove("go"); void hint.offsetWidth; hint.classList.add("go");
+      } else {
+        hint.innerHTML = hintHTML;
+        hint.classList.remove("go");
+      }
+    }
+    function nudge() {
+      const tip = $("leverTip"), hint = $("pullHint");
+      tip.classList.remove("nudge"); hint.classList.remove("flash");
+      void tip.offsetWidth;
+      tip.classList.add("nudge"); hint.classList.add("flash");
+    }
+    function fire() {
+      tween(1, 120 * (1 - cur) + 40, easeIn, () => {
+        spin();
+        setTimeout(() => springBack(650), 120);
+      });
+    }
+
+    lever.addEventListener("pointerdown", (e) => {
+      if (spinning) return;
+      e.preventDefault();
+      drag = { y: e.clientY, p: 0 };
+      try { lever.setPointerCapture(e.pointerId); } catch (err) {}
+      cancelAnimationFrame(anim);
+      lever.classList.add("grab");
+    });
+    lever.addEventListener("pointermove", (e) => {
+      if (!drag) return;
+      const x = Math.max(0, Math.min(1, (e.clientY - drag.y) / PULL));
+      const p = 1 - Math.pow(1 - x, 2);           // 阻力：前段好拉，越往下越重
+      const wasArmed = drag.p >= TRIGGER;
+      drag.p = p;
+      setArm(p);
+      if (!wasArmed && p >= TRIGGER) armed(true);
+      else if (wasArmed && p < TRIGGER) armed(false);
+    });
+    const release = () => {
+      if (!drag) return;
+      const p = drag.p;
+      drag = null;
+      lever.classList.remove("grab");
+      knob.classList.remove("armed");
+      if (p >= TRIGGER) fire();
+      else { armed(false); springBack(380); if (p < 0.1) nudge(); }
+    };
+    lever.addEventListener("pointerup", release);
+    lever.addEventListener("pointercancel", release);
+    lever.addEventListener("lostpointercapture", release);
+    // 鍵盤使用者：Enter / 空白鍵直接拉
+    lever.addEventListener("keydown", (e) => {
+      if ((e.key === "Enter" || e.key === " ") && !spinning) { e.preventDefault(); fire(); }
+    });
+    // 點機台也提示要拉拉桿
+    $("machine").addEventListener("click", () => { if (!spinning) nudge(); });
+  })();
 
   /* ---------- 啟動 ---------- */
   window.addEventListener("load", () => {
@@ -769,9 +1125,11 @@
     const params = new URLSearchParams(location.search);
     if (params.has("reset")) {
       store.clear();
+      try { sessionStorage.setItem("kc_test", "1"); } catch (e) {}   // 這個分頁進入測試模式，不計入次數
       history.replaceState(null, "", location.pathname);
     }
 
+    counter.load();
     const state = store.get();
     if (state && state.step === "result" && PRIZES[state.idx]) renderResult(state);
     else if (state && state.step === "slot") show("slot");
