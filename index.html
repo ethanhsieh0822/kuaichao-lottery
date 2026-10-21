@@ -3,21 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>筷炒 | 會員好禮拉霸</title>
-  <meta name="theme-color" content="#1f244d">
+  <title>筷炒 | 筷點抽好禮！</title>
+  <meta name="theme-color" content="#1e234e">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Iansui&amp;text=%E7%85%99%E7%87%BB%E9%BB%91%E9%B1%88%E9%AD%9A%E7%B4%85%E9%80%9A%E9%AF%9B%E7%89%87%E8%82%89%E7%B5%B2%E7%82%92%E6%B0%B4%E8%93%AE%E7%84%A1%E9%85%92%E7%B2%BE%E9%A3%B2%E5%93%81%E9%A6%99%E8%84%86%E8%8A%B1%E9%9B%95%E9%9B%9E%E8%8F%9C%E8%84%AF%E7%8E%89%E5%AD%90%E7%87%92%E8%8A%8B%E6%A3%97%E5%8F%A4%E6%97%A9%E5%91%B3%E7%B1%B3%E7%B2%89%E5%8D%97%E6%B4%8B%E9%85%A5%E8%9F%B9%E7%A5%9E%E7%A7%98%E7%8D%8E%E9%A0%85&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@900&amp;text=%E9%AE%AE%E9%A6%99%E8%AE%9A%E9%A3%B2%E5%AF%B6%E7%89%B9%E7%94%9C%E5%8F%B0%E8%9F%B9%E5%AF%86&amp;display=swap" rel="stylesheet">
   <link rel="icon" href="images/logo-180.png">
   <link rel="apple-touch-icon" href="images/logo-180.png">
   <style>
     :root {
       /* 品牌色 */
-      --navy: #1f244d;
+      /* 配色與「筷點抽好禮」DM 一致 */
+      --navy: #1e234e;
       --navy-d: #151938;
-      --cream: #dfdacb;
-      --cream-l: #efebe0;
-      /* 點綴色（只用在燈泡、彩帶、印章） */
-      --red: #e63946;
-      --gold: #f2b632;
-      --muted: rgba(31, 36, 77, 0.68);
+      --cream: #e7e4dc;
+      --cream-l: #f4f2f0;
+      --red: #e83328;
+      --red-d: #b3241b;
+      --gold: #f2c672;
+      --muted: rgba(30, 35, 78, 0.7);
       --cell: 150px;
       --gap: 3px;
     }
@@ -27,8 +31,8 @@
 
     body {
       background-color: var(--navy);
-      background-image: radial-gradient(rgba(223, 218, 203, 0.08) 1.5px, transparent 1.7px);
-      background-size: 18px 18px;
+      background-image: radial-gradient(rgba(231, 228, 220, 0.09) 2.5px, transparent 2.8px);
+      background-size: 30px 30px;
       color: var(--navy);
       font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
       min-height: 100dvh;
@@ -38,11 +42,20 @@
       padding: 16px 0 24px;
     }
 
+    .page { position: relative; width: calc(100% - 32px); max-width: 390px; }
     .frame {
       position: relative;
-      width: calc(100% - 32px);
-      max-width: 390px;
-      padding: 0 16px 18px;
+      width: 100%;
+      padding: 40px 16px 18px;
+    }
+    /* 頁首：KC 標誌＋「筷點抽好禮！」招牌（與 DM 相同的圖），招牌壓在米白面板上緣 */
+    .top { position: relative; z-index: 3; height: 92px; margin-bottom: -46px; }
+    .top .kc { position: absolute; left: 0; top: 0; width: 30px; height: auto; }
+    .top .banner { position: absolute; left: 50%; top: 4px; width: 330px; max-width: 92%; height: auto; transform: translateX(-50%); filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.18)); }
+    .plus-tag {
+      align-self: flex-end; margin: -6px 2px 0;
+      background: var(--gold); color: var(--navy); padding: 2px 6px;
+      font-size: 12px; font-weight: 900; letter-spacing: 1px; line-height: 1;
     }
     /* 外框底色獨立一層：飄散紙花夾在底色與內容之間，不會蓋住文字 */
     .frame-bg {
@@ -52,31 +65,8 @@
       box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
     }
     .frame > :not(.frame-bg) { position: relative; z-index: 2; }
-    .frame > .ticker { border-radius: 10px 10px 0 0; }
     #ambient { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
 
-    /* ---------- 跑馬燈文字 ---------- */
-    .ticker {
-      margin: 0 -16px 14px;
-      background: var(--navy-d);
-      color: var(--cream);
-      overflow: hidden;
-      white-space: nowrap;
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      padding: 7px 0;
-      border-bottom: 3px solid var(--gold);
-    }
-    .ticker-inner { display: inline-block; animation: ticker 26s linear infinite; }
-    .ticker-inner b { color: var(--gold); margin: 0 10px; }
-    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-
-    .header { text-align: center; }
-    .logo {
-      width: 96px; height: 96px; border-radius: 50%; display: block; margin: 0 auto;
-      box-shadow: 0 0 0 3px var(--gold), 0 0 0 5px var(--navy), 0 8px 16px rgba(0, 0, 0, 0.25);
-    }
 
     /* ---------- 進度 ---------- */
     .steps { display: flex; justify-content: center; gap: 6px; margin: 16px 0 16px; }
@@ -100,6 +90,16 @@
       font-style: normal; color: var(--cream); background: var(--navy);
       padding: 0 8px; border-radius: 4px; display: inline-block; transform: rotate(-2deg);
     }
+    .headline {
+      margin: 6px 0 6px; font-size: 17px; font-weight: 900; line-height: 1.5; letter-spacing: 0.5px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .headline span { white-space: nowrap; }
+    .headline span::before {
+      content: ""; display: inline-block; margin-right: 6px; vertical-align: 1px;
+      border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 10px solid var(--red);
+    }
+    .headline b { font-size: 20px; }
     .lead { font-size: 13px; font-weight: 700; color: var(--muted); margin: 0 0 14px; line-height: 1.6; }
 
     .section-title {
@@ -118,7 +118,7 @@
     }
     .face.alt { background: var(--cream); color: var(--navy); box-shadow: inset 0 0 0 2px var(--navy); }
     .face.coin {
-      background: radial-gradient(circle at 35% 30%, #ffe39a, var(--gold) 55%, #c8901a);
+      background: radial-gradient(circle at 35% 30%, #ffe7b3, var(--gold) 55%, #c9973f);
       color: var(--navy); box-shadow: inset 0 0 0 2px var(--navy);
     }
     .face img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -154,14 +154,34 @@
     .marquee:active .track { animation-play-state: paused; }   /* 手指按住可暫停細看 */
     @keyframes flow { from { transform: translateX(0); } to { transform: translateX(-50%); } }
     .pcard {
-      width: 132px; flex-shrink: 0;
-      background: var(--cream-l); border-radius: 8px;
-      overflow: hidden;
+      position: relative; width: 136px; flex-shrink: 0;
+      border: 3px solid var(--gold); border-radius: 8px;
+      overflow: hidden; background: var(--navy);
     }
-    .pcard .face { aspect-ratio: 16 / 10; border-radius: 0; font-size: 17px; box-shadow: none; }
+    .pcard .face { aspect-ratio: 4 / 5; border-radius: 0; font-size: 17px; box-shadow: none; }
     .pcard .face br { display: none; }
     .pcard .face.alt { box-shadow: none; }
-    .pcard .nm { font-size: 13px; font-weight: 900; padding: 8px 4px; line-height: 1.3; white-space: nowrap; }
+    .ribbon { position: absolute; left: 4px; right: 0; bottom: 8px; z-index: 2; display: flex; align-items: center; }
+    .ribbon .badge {
+      flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; z-index: 1;
+      background: var(--cream); color: var(--red);
+      display: flex; align-items: center; justify-content: center;
+      font-family: "Noto Sans TC", sans-serif; font-size: 17px; font-weight: 900;
+    }
+    .ribbon .nm {
+      margin-left: -8px; padding: 3px 16px 3px 12px;
+      background: var(--red); color: var(--cream);
+      font-family: "Iansui", "Noto Sans TC", sans-serif; font-size: 13px; letter-spacing: 1px; white-space: nowrap;
+      clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 50%, 100% 100%, 0 100%);
+    }
+    /* 神秘獎項（200 元現金折抵）：紅底＋「密」字圓章，與 DM 相同 */
+    .face.secret { background: var(--red); color: var(--cream); flex-direction: column; gap: 6px; }
+    .face.secret .seal {
+      width: 64%; aspect-ratio: 1 / 1; border-radius: 50%; border: 4px solid var(--cream);
+      display: flex; align-items: center; justify-content: center;
+      font-family: "Noto Sans TC", sans-serif; font-weight: 900; font-size: 2.6em; line-height: 1;
+    }
+    .face.secret small { font-size: 0.62em; font-weight: 700; letter-spacing: 1px; }
     .showcase-tip { font-size: 11px; font-weight: 800; color: var(--muted); margin: -8px 0 16px; }
 
     /* ---------- 活動說明 ---------- */
@@ -171,7 +191,8 @@
       background: var(--cream-l); border: 2px dashed var(--navy); border-radius: 8px;
       padding: 10px 10px 10px 4px; margin: 0 0 16px;
     }
-    .rules ul { margin: 0; padding-left: 20px; }
+    .rules ol { margin: 6px 0 0; padding-left: 22px; }
+    .rules-sum { font-weight: 900; padding-left: 8px; }
 
     /* ---------- 按鈕 ---------- */
     .btn {
@@ -229,7 +250,7 @@
       border: 3px solid var(--gold); border-radius: 30px;
       padding: 5px 18px; white-space: nowrap;
       font-size: 15px; font-weight: 900; letter-spacing: 3px;
-      box-shadow: 0 4px 0 #a51f2a; z-index: 4;
+      box-shadow: 0 4px 0 var(--red-d); z-index: 4;
     }
 
     .bulbs { position: absolute; inset: 11px; pointer-events: none; }
@@ -322,7 +343,7 @@
     .lever .knob {
       position: absolute; left: 50%; top: 26px; width: 40px; height: 40px; margin-left: -20px;
       border-radius: 50%; z-index: 2;
-      background: radial-gradient(circle at 35% 30%, #ff9aa1, var(--red) 55%, #a51f2a);
+      background: radial-gradient(circle at 35% 30%, #ff9aa1, var(--red) 55%, var(--red-d));
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
     /* 拉桿頭的光圈，提示可以拉 */
@@ -404,7 +425,7 @@
       background: var(--cream-l);
       border: 3px solid var(--navy); border-radius: 14px;
       box-shadow: 5px 5px 0 var(--navy);
-      padding: 26px 16px 16px; margin: 14px 0 18px;
+      padding: 34px 16px 16px; margin: 14px 0 18px;
     }
     .stamp {
       position: absolute; top: -18px; left: 50%;
@@ -412,7 +433,7 @@
       border: 3px solid var(--gold); border-radius: 8px;
       padding: 5px 18px; white-space: nowrap;
       font-size: 20px; font-weight: 900; letter-spacing: 4px;
-      box-shadow: 0 4px 0 #a51f2a;
+      box-shadow: 0 4px 0 var(--red-d);
       transform: translateX(-50%) rotate(-3deg);
       animation: stampIn 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both;
     }
@@ -436,6 +457,8 @@
     }
     .perf::before { left: -14px; clip-path: inset(0 0 0 50%); }
     .perf::after { right: -14px; clip-path: inset(0 50% 0 0); }
+    .res-kicker { margin: 0 0 8px; color: var(--red); font-size: 15px; font-weight: 900; letter-spacing: 2px; }
+    .res-kicker[hidden] { display: none; }
     .res-note { font-size: 13px; font-weight: 700; line-height: 1.6; margin: 0 0 12px; }
     .timebox {
       display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; margin: 0;
@@ -467,7 +490,7 @@
     #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
 
     @media (prefers-reduced-motion: reduce) {
-      .ticker-inner, .bulb { animation: none; }
+      .bulb { animation: none; }
       .track { animation-duration: 120s; }
       .bulb { opacity: 0.8; }
     }
@@ -478,13 +501,13 @@
 <canvas id="ambient"></canvas>
 <canvas id="confetti"></canvas>
 
+<div class="page">
+<div class="top">
+  <img src="images/kc-white.svg" class="kc" alt="筷炒 KC">
+  <img src="images/title-banner.png" class="banner" alt="筷點抽好禮！" width="881" height="253">
+</div>
 <div class="frame">
   <div class="frame-bg"></div>
-  <div class="ticker"><div class="ticker-inner" id="ticker"></div></div>
-
-  <div class="header">
-    <img src="images/logo.webp" class="logo" alt="筷炒 KUAI CHAO" width="96" height="96">
-  </div>
 
   <div class="steps" aria-hidden="true">
     <div class="step" data-step="1">① 加入會員</div>
@@ -494,8 +517,9 @@
 
   <!-- 場景 1：活動說明 + 加入會員 -->
   <section class="scene" id="scene-intro">
-    <h1>加入會員<br><em>拉霸抽好禮</em></h1>
-    <p class="lead">人人有獎！加入筷炒 Ocard 會員<br>就能拉一次，好菜直接帶回桌上</p>
+    <div class="plus-tag" aria-hidden="true">✚✚✚✚</div>
+    <h1 class="headline"><span>單點消費滿 <b>$2,000</b> 可參加遊戲！</span><span>保證中獎！</span></h1>
+    <p class="lead">加入筷炒 Ocard 會員就能拉一次<br>好菜直接帶回桌上</p>
 
     <div class="section-title">本期好禮</div>
     <div class="showcase">
@@ -508,7 +532,10 @@
     <div class="showcase-tip">按住可暫停查看</div>
     <div class="counter" data-counter hidden><span data-label>今日已送出</span><span class="digits">0</span>份好禮</div>
 
-    <div class="rules"><ul id="rulesList"></ul></div>
+    <div class="rules">
+      <div class="rules-sum" id="rulesSum"></div>
+      <ol id="rulesList"></ol>
+    </div>
 
     <div class="sticky-cta">
       <a class="btn" id="joinBtn" target="_blank" rel="noopener">加入會員・前往 Ocard</a>
@@ -535,7 +562,7 @@
 
     <div class="machine-area">
       <div class="machine" id="machine">
-        <div class="plate">筷炒好禮機</div>
+        <div class="plate">筷點抽好禮</div>
         <div class="bulbs" id="bulbs"></div>
         <div class="window">
           <div class="reel"><div class="strip" id="strip0"></div></div>
@@ -560,6 +587,7 @@
   <section class="scene" id="scene-result">
     <div class="ticket">
       <div class="stamp">恭喜獲得</div>
+      <p class="res-kicker" id="resKicker" hidden>神秘獎項揭曉！</p>
       <div class="t-photo face" id="resPhoto"><span id="resPhotoText"></span></div>
       <p class="res-name" id="resName"></p>
       <div class="perf"></div>
@@ -570,7 +598,7 @@
       </dl>
     </div>
     <div class="show-staff">請將此畫面出示給服務人員兌換</div>
-    <div class="hint">限本次消費當場使用・品項如遇售完以等值品項替換</div>
+    <div class="hint">獎項限當場使用，離店視同放棄・品項售完由現場人員告知等值替換</div>
     <a class="btn btn-ghost ig-btn" href="https://www.instagram.com/kuaichao.taibei/" target="_blank" rel="noopener">追蹤 IG 看更多新菜</a>
   </section>
 
@@ -578,6 +606,7 @@
     <a href="https://www.facebook.com/KUAICHAO.TAIPEI/photos" target="_blank" rel="noopener" class="social-btn">FACEBOOK</a>
     <a href="https://www.instagram.com/kuaichao.taibei/" target="_blank" rel="noopener" class="social-btn">INSTAGRAM</a>
   </div>
+</div>
 </div>
 
 <script>
@@ -593,35 +622,42 @@
   const COUNTER_MIN  = 10;        // 數字低於這個值時先不顯示，避免開店時看起來冷清
   const IMG_DIR = "images/";   // 照片放在與 index.html 同層的 images 資料夾
 
-  // name：完整品名 / short：拉霸格子上的簡稱 / value：價值
+  // 順序與 DM 相同。name：完整品名 / label：卡片緞帶上的名稱 / badge：圓章上的字
   // type：drink 飲品、cash 現金折抵、dish 菜品（決定兌換說明）
-  // img：照片檔名（檔案不存在時自動顯示文字）
-  // enabled：改成 false 就不會被抽到
+  // secret：true 時，在展示區與滾輪上以「密」神秘獎項呈現，抽中才揭曉
+  // img：照片檔名（檔案不存在時自動顯示文字）/ enabled：改成 false 就不會被抽到
   const PRIZES = [
-    { name: "全品項無酒精飲品", short: "飲品<br>一杯",  value: 200, type: "drink", img: "01-drink.webp",            enabled: true },
-    { name: "200 元現金折抵",   short: "$200", value: 200, type: "cash",  img: "02-cash200.webp",          enabled: true },
-    { name: "菜脯玉子燒",       short: "玉子燒",        value: 230, type: "dish",  img: "03-tamagoyaki.webp",       enabled: true },
-    { name: "香脆花雕雞",       short: "花雕雞",        value: 388, type: "dish",  img: "04-huadiao-chicken.webp",  enabled: true },
-    { name: "紅通通鯛魚片",     short: "鯛魚片",        value: 388, type: "dish",  img: "05-snapper.webp",          enabled: true },
-    { name: "肉絲炒水蓮",       short: "炒水蓮",        value: 285, type: "dish",  img: "06-water-lotus.webp",      enabled: true },
-    { name: "南洋香酥蟹",       short: "香酥蟹",        value: 488, type: "dish",  img: "07-crab.webp",             enabled: true },
-    { name: "古早味炒米粉",     short: "炒米粉",        value: 330, type: "dish",  img: "08-rice-noodle.webp",      enabled: true },
-    { name: "芋棗",             short: "芋棗",          value: 180, type: "dish",  img: "09-taro-ball.webp",        enabled: true },
-    { name: "煙燻黑鱈魚",       short: "黑鱈魚",        value: 488, type: "dish",  img: "10-black-cod.webp",        enabled: true }
+    { name: "煙燻黑鱈魚",       label: "煙燻黑鱈魚",   badge: "鮮", short: "黑鱈魚", type: "dish",  img: "10-black-cod.webp",       enabled: true },
+    { name: "紅通通鯛魚片",     label: "紅通通鯛魚片", badge: "香", short: "鯛魚片", type: "dish",  img: "05-snapper.webp",         enabled: true },
+    { name: "肉絲炒水蓮",       label: "肉絲炒水蓮",   badge: "讚", short: "炒水蓮", type: "dish",  img: "06-water-lotus.webp",     enabled: true },
+    { name: "全品項無酒精飲品", label: "無酒精飲品",   badge: "飲", short: "飲品",   type: "drink", img: "01-drink.webp",           enabled: true },
+    { name: "香脆花雕雞",       label: "香脆花雕雞",   badge: "寶", short: "花雕雞", type: "dish",  img: "04-huadiao-chicken.webp", enabled: true },
+    { name: "菜脯玉子燒",       label: "菜脯玉子燒",   badge: "特", short: "玉子燒", type: "dish",  img: "03-tamagoyaki.webp",      enabled: true },
+    { name: "芋棗",             label: "芋棗",         badge: "甜", short: "芋棗",   type: "dish",  img: "09-taro-ball.webp",       enabled: true },
+    { name: "古早味炒米粉",     label: "古早味炒米粉", badge: "台", short: "炒米粉", type: "dish",  img: "08-rice-noodle.webp",     enabled: true },
+    { name: "南洋香酥蟹",       label: "南洋香酥蟹",   badge: "蟹", short: "香酥蟹", type: "dish",  img: "07-crab.webp",            enabled: true },
+    { name: "200 元現金折抵",   label: "神秘獎項",     badge: "密", short: "密",     type: "cash",  secret: true,                   enabled: true }
   ];
+  // 舊版的獎項順序：讓改版前已抽完的客人，重新整理後仍顯示正確的獎項
+  const LEGACY_ORDER = ["全品項無酒精飲品", "200 元現金折抵", "菜脯玉子燒", "香脆花雕雞", "紅通通鯛魚片", "肉絲炒水蓮", "南洋香酥蟹", "古早味炒米粉", "芋棗", "煙燻黑鱈魚"];
 
+  // 活動說明：與 DM 相同
+  const RULES_SUMMARY = "內用單點消費滿 NT$2,000，並加入 Ocard 會員即可參加・每桌限抽一次・10 項好禮機率均等";
   const RULES = [
-    "本次單筆消費滿 NT$2,000 即可參加，每桌限拉一次",
-    "須加入筷炒 Ocard 會員，並出示會員畫面給服務人員",
-    "獎項限本次消費當場使用",
-    "菜品若本次已點同一道菜，則直接折抵該道菜",
-    "品項如遇售完，以等值品項替換"
+    "限單筆內用單點滿 NT$2,000，每桌限抽一次，金額以結帳系統為準。",
+    "須先加入筷炒 Ocard 會員，並於抽獎前出示會員畫面。",
+    "抽中菜品可免費兌換一份；已點同菜者直接折抵，不另加贈。",
+    "現金折抵 NT$200 限本次消費使用，不找零、不兌現。",
+    "品項售完由現場人員告知等值替換菜色，恕不指定。",
+    "獎項限當場使用，離店視同放棄；不得轉讓、兌現或與其他優惠併用。",
+    "兌獎須出示本次抽獎完成畫面，截圖或非本次畫面恕不受理。",
+    "以不當方式參加者，本店有權取消資格；本店保留活動修改及最終解釋權。"
   ];
 
   const NOTES = {
     drink: "全品項無酒精飲品任選 1 杯",
-    cash:  "本次消費現折 200 元",
-    dish:  "招待 1 份；若本次已點同一道菜，則直接折抵該道菜"
+    cash:  "本次消費現折 NT$200，不找零、不兌現",
+    dish:  "免費兌換一份；已點同菜者直接折抵，不另加贈"
   };
 
   /* ============================================================
@@ -653,20 +689,21 @@
   const reelPos = [2, 5, 8];   // 每個滾輪目前停在 strip 的第幾格
 
   function faceClass(i) {
-    if (PRIZES[i].type === "cash") return "face coin";
+    if (PRIZES[i].secret) return "face secret";
     return i % 2 === 0 ? "face" : "face alt";
   }
+  function faceInner(i) {
+    if (PRIZES[i].secret) return `<span class="seal">密</span><small>神秘獎項</small>`;
+    return `<span>${PRIZES[i].short}</span>`;
+  }
   function faceHTML(i, extra = "") {
-    return `<div class="${faceClass(i)} ${extra}" data-face="${i}"><span>${PRIZES[i].short}</span></div>`;
+    return `<div class="${faceClass(i)} ${extra}" data-face="${i}">${faceInner(i)}</div>`;
   }
 
   /* ---------- 建立畫面 ---------- */
   function buildStatic() {
-    const names = PRIZES.map(p => p.name).join("<b>★</b>") + "<b>★</b>";
-    $("ticker").innerHTML = names + names;
-
     // 兩列各 5 項，複製一份讓流動無縫循環
-    const card = (i) => `<li class="pcard">${faceHTML(i)}<div class="nm">${PRIZES[i].name}</div></li>`;
+    const card = (i) => `<li class="pcard">${faceHTML(i)}<div class="ribbon"><span class="badge">${PRIZES[i].badge}</span><span class="nm">${PRIZES[i].label}</span></div></li>`;
     const half = Math.ceil(N / 2);
     [PRIZES.slice(0, half), PRIZES.slice(half)].forEach((list, r) => {
       const start = r === 0 ? 0 : half;
@@ -674,6 +711,7 @@
       $("row" + r).innerHTML = html + html;
     });
 
+    $("rulesSum").textContent = RULES_SUMMARY;
     $("rulesList").innerHTML = RULES.map(r => `<li>${r}</li>`).join("");
     $("joinBtn").href = OCARD_URL;
     $("rejoinBtn").href = OCARD_URL;
@@ -726,6 +764,7 @@
   }
   function probeImages() {
     PRIZES.forEach((p, i) => {
+      if (!p.img) return;   // 神秘獎項沒有照片
       const im = new Image();
       im.onload = () => { imgLoaded[i] = true; applyImage(i); };
       im.src = IMG_DIR + p.img;
@@ -791,7 +830,7 @@
     $("pullHint").textContent = "轉動中…";
 
     const idx = draw();
-    const state = { step: "result", idx, ts: Date.now() };
+    const state = { step: "result", idx, name: PRIZES[idx].name, ts: Date.now() };
     store.set(state);                  // 先存結果再播動畫：中途重新整理也不能重拉
 
     const machine = $("machine");
@@ -842,16 +881,22 @@
     return `${d.getFullYear()}/${p(d.getMonth() + 1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
   }
   let clockTimer = null;
+  // 用獎項名稱找回索引；舊版紀錄沒有名稱，就依舊版順序換算
+  function resolveIdx(state) {
+    if (!state) return -1;
+    const name = state.name || LEGACY_ORDER[state.idx];
+    return PRIZES.findIndex(p => p.name === name);
+  }
   function renderResult(state) {
-    const i = state.idx;
+    const i = resolveIdx(state);
     const p = PRIZES[i];
     const photo = $("resPhoto");
     photo.className = faceClass(i) + " t-photo";
     photo.dataset.face = i;
-    photo.querySelectorAll("img").forEach(el => el.remove());
-    $("resPhotoText").innerHTML = p.short;
+    photo.innerHTML = faceInner(i);
     if (imgLoaded[i]) applyImage(i);
 
+    $("resKicker").hidden = !p.secret;
     $("resName").textContent = p.name;
     $("resNote").textContent = NOTES[p.type];
     $("drawTime").textContent = fmt(new Date(state.ts));
@@ -867,7 +912,7 @@
     const cv = $("ambient");
     const frameEl = document.querySelector(".frame");
     const ctx = cv.getContext("2d");
-    const colors = ["#e63946", "#f2b632", "#f2b632", "#dfdacb", "#1f244d", "#7fa7d9"];
+    const colors = ["#e83328", "#f2c672", "#f2c672", "#e7e4dc", "#ffffff", "#7fa7d9"];
     let W = 0, H = 0, parts = [], raf = null, last = 0;
 
     function resize() {
@@ -947,7 +992,7 @@
     const W = innerWidth, H = innerHeight;
     cv.width = W * dpr; cv.height = H * dpr;
     ctx.scale(dpr, dpr);
-    const colors = ["#1f244d", "#dfdacb", "#e63946", "#f2b632", "#f2b632"];
+    const colors = ["#1e234e", "#e7e4dc", "#e83328", "#f2c672", "#f2c672"];
     const parts = Array.from({ length: 150 }, () => ({
       x: W / 2 + (Math.random() - 0.5) * 60,
       y: H * 0.32,
@@ -1131,7 +1176,7 @@
 
     counter.load();
     const state = store.get();
-    if (state && state.step === "result" && PRIZES[state.idx]) renderResult(state);
+    if (state && state.step === "result" && resolveIdx(state) >= 0) renderResult(state);
     else if (state && state.step === "slot") show("slot");
     else if (state && state.step === "confirm") show("confirm");
     else show("intro");
